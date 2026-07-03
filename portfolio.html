@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Jack Imagined</title>
+<meta name="description" content="Secure checkout for Jack Imagined — pay with Stripe, PayPal, or Interac e-Transfer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<!-- PayPal SDK — replace client-id with your own publishable client ID (safe to expose client-side) -->
+<script src="https://www.paypal.com/sdk/js?client-id=REPLACE_WITH_YOUR_PAYPAL_CLIENT_ID&currency=CAD"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a href="index.html" class="logo"><span class="dot"></span>Jack Imagined</a>
+    <ul class="nav-links" data-nav-links>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="book.html">The Book</a></li>
+      <li><a href="checkout.html" aria-current="page">Checkout</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="portfolio.html#commission" class="btn btn-ghost">Commission work</a>
+      <button class="cart-btn" data-cart-open aria-label="Open cart">Cart <span class="cart-count" data-cart-count>0</span></button>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <p class="eyebrow">Secure checkout</p>
+    <h1 style="font-size:clamp(2.2rem,5vw,3.2rem);">Complete your order.</h1>
+    <p style="max-width:52ch;color:var(--ink-60);">Pay by card through Stripe or PayPal, or send an Interac e-Transfer if you're ordering from Canada. Every method is encrypted and none of your card details ever touch our servers.</p>
+  </div>
+</section>
+
+<div class="horizon" aria-hidden="true"></div>
+
+<section>
+  <div class="wrap checkout-grid">
+
+    <div>
+      <div class="pay-tabs">
+        <button class="pay-tab active" data-pay-tab="stripe"><strong>Card — Stripe</strong><span>Visa, Mastercard, Amex</span></button>
+        <button class="pay-tab" data-pay-tab="paypal"><strong>PayPal</strong><span>Pay or Pay in 4</span></button>
+        <button class="pay-tab" data-pay-tab="etransfer" id="etransfer"><strong>Interac e-Transfer</strong><span>Canada only</span></button>
+      </div>
+
+      <!-- STRIPE -->
+      <div class="pay-panel active" data-pay-panel="stripe">
+        <h3 style="font-size:1.1rem;">Pay securely with Stripe</h3>
+        <p class="card-desc">You'll be redirected to Stripe's secure checkout page to enter your card details. Stripe is PCI-compliant — your card number never passes through this site.</p>
+        <div class="field">
+          <label for="s-email">Email for your receipt</label>
+          <input id="s-email" type="email" placeholder="you@email.com">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="goToStripeCheckout()">Continue to Stripe →</button>
+        <p style="margin-top:1rem;color:var(--ink-60);font-size:.8rem;">
+          Powered by Stripe Payment Links. To combine multiple cart items into a single Stripe charge, connect a lightweight Checkout Session endpoint — see the project README, "Connecting Stripe."
+        </p>
+      </div>
+
+      <!-- PAYPAL -->
+      <div class="pay-panel" data-pay-panel="paypal">
+        <h3 style="font-size:1.1rem;">Pay with PayPal</h3>
+        <p class="card-desc">Log in with your PayPal account, or use a card via PayPal's guest checkout — no account required.</p>
+        <div id="paypal-button-container" style="min-height:48px;"></div>
+        <p style="margin-top:1rem;color:var(--ink-60);font-size:.8rem;">
+          Buttons render live once you add your PayPal client ID in <code>checkout.html</code> — see README, "Connecting PayPal."
+        </p>
+      </div>
+
+      <!-- E-TRANSFER -->
+      <div class="pay-panel" data-pay-panel="etransfer">
+        <h3 style="font-size:1.1rem;">Pay with Interac e-Transfer</h3>
+        <p class="card-desc">Available for Canadian customers. E-Transfers are sent manually through your bank, so orders are confirmed once payment is received rather than instantly.</p>
+        <div class="etransfer-box">
+          <p style="margin:0 0 .75em;"><strong>How to pay:</strong></p>
+          <ol style="margin:0 0 .75em;padding-left:1.2em;">
+            <li>Send your e-Transfer to <code>payments@jackimagined.com</code></li>
+            <li>Use your order total as the amount, and set the security answer to <code>sunrise</code></li>
+            <li>Enter your order number in the transfer message</li>
+            <li>Submit the confirmation form below</li>
+          </ol>
+          <p style="margin:0;">Orders are held for 48 hours awaiting payment, then confirmed by email once received — usually within one business day.</p>
+        </div>
+
+        <form style="margin-top:1.75rem;" data-etransfer-form>
+          <div class="field-row">
+            <div class="field">
+              <label for="e-name">Full name</label>
+              <input id="e-name" name="name" type="text" required>
+            </div>
+            <div class="field">
+              <label for="e-order">Order number</label>
+              <input id="e-order" name="order" type="text" placeholder="e.g. JI-1042" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="e-email">Email</label>
+            <input id="e-email" name="email" type="email" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Confirm I've sent payment</button>
+        </form>
+        <p data-etransfer-feedback style="margin-top:1rem;color:var(--orange-600);font-size:.88rem;"></p>
+        <p style="margin-top:1rem;color:var(--ink-60);font-size:.8rem;">
+          This form is a working demo — connect it to your inbox or a backend (e.g. Formspree, or a simple serverless function) to receive real submissions. See README, "Connecting Interac e-Transfer."
+        </p>
+      </div>
+    </div>
+
+    <aside class="order-summary">
+      <h3>Order summary</h3>
+      <div data-checkout-summary></div>
+      <div class="order-total"><span>Total</span><span data-checkout-total>$0.00 CAD</span></div>
+      <div class="badge-row">
+        <span class="badge">256-bit encryption</span>
+        <span class="badge">PCI compliant</span>
+        <span class="badge">Printed to order</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Jack Imagined</div>
+        <p style="max-width:32ch;font-size:.9rem;">Custom graphic apparel and original art, made where the night sky meets the first light.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All products</a></li>
+          <li><a href="shop.html">Apparel</a></li>
+          <li><a href="shop.html">Art prints</a></li>
+          <li><a href="shop.html">Accessories</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Studio</h4>
+        <ul>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="portfolio.html#commission">Commissions</a></li>
+          <li><a href="book.html">First Light book</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="checkout.html">Checkout &amp; payment</a></li>
+          <li><a href="checkout.html#etransfer">Interac e-Transfer</a></li>
+          <li><a href="mailto:hello@jackimagined.com">hello@jackimagined.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Jack Imagined. All artwork original.</span>
+      <div class="pay-icons"><span>Stripe</span><span>PayPal</span><span>Interac e-Transfer</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="cart-overlay" data-cart-overlay></div>
+<aside class="cart-drawer" data-cart-drawer aria-label="Shopping cart">
+  <div class="cart-head">
+    <h3 style="margin:0;">Your cart</h3>
+    <button data-cart-close class="btn btn-ghost" aria-label="Close cart" style="padding:0;">Close</button>
+  </div>
+  <div class="cart-items" data-cart-items></div>
+  <div class="cart-foot">
+    <div class="order-line"><span>Subtotal</span><span data-cart-total>$0.00 CAD</span></div>
+    <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:1rem;">Go to checkout</a>
+  </div>
+</aside>
+
+<script src="js/main.js"></script>
+</body>
+</html>

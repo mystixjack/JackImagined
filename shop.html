@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Jack Imagined</title>
+<meta name="description" content="A portfolio of original art and custom illustration work by Jack Imagined, plus commission inquiries.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a href="index.html" class="logo"><span class="dot"></span>Jack Imagined</a>
+    <ul class="nav-links" data-nav-links>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="portfolio.html" aria-current="page">Portfolio</a></li>
+      <li><a href="book.html">The Book</a></li>
+      <li><a href="checkout.html">Checkout</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#commission" class="btn btn-ghost">Commission work</a>
+      <button class="cart-btn" data-cart-open aria-label="Open cart">Cart <span class="cart-count" data-cart-count>0</span></button>
+      <button class="nav-toggle" data-nav-toggle aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<section style="padding-bottom:0;">
+  <div class="wrap">
+    <p class="eyebrow">Selected work</p>
+    <h1 style="font-size:clamp(2.2rem,5vw,3.4rem);max-width:16ch;">Portfolio.</h1>
+    <p style="max-width:52ch;color:var(--ink-60);">Illustration, gradient studies, and custom commission pieces — a running record of what ends up on shirts, prints, and eventually, the book.</p>
+  </div>
+</section>
+
+<div class="horizon" aria-hidden="true"></div>
+
+<section>
+  <div class="wrap">
+    <div class="masonry">
+      <figure class="masonry-item" style="aspect-ratio:3/4;">
+        <div class="masonry-cap"><b>Daybreak No. 3</b><span>Digital illustration, 2026</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:1/1;">
+        <div class="masonry-cap"><b>Ridge Line</b><span>Ink &amp; digital, 2025</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:4/5;">
+        <div class="masonry-cap"><b>Ember Study</b><span>Gouache on paper, 2025</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:1/1;">
+        <div class="masonry-cap"><b>Commission — Local Roasters Co.</b><span>Apparel graphic, 2026</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:3/4;">
+        <div class="masonry-cap"><b>Skyline Study</b><span>Digital illustration, 2024</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:4/5;">
+        <div class="masonry-cap"><b>Aurora</b><span>Digital illustration, 2026</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:1/1;">
+        <div class="masonry-cap"><b>Horizon Mark</b><span>Brand identity, 2025</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:3/4;">
+        <div class="masonry-cap"><b>First Light</b><span>Cover study, 2026</span></div>
+      </figure>
+      <figure class="masonry-item" style="aspect-ratio:4/5;">
+        <div class="masonry-cap"><b>Solstice</b><span>Screen-print proof, 2025</span></div>
+      </figure>
+    </div>
+    <p style="margin-top:2.5rem;color:var(--ink-60);font-size:.9rem;">Swap the placeholder tiles above for your own photography — each <code>.masonry-item</code> accepts an <code>&lt;img&gt;</code> tag directly.</p>
+  </div>
+</section>
+
+<div class="horizon flip" aria-hidden="true"></div>
+
+<section class="bg-dark" id="commission">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Custom work</p>
+        <h2>Commission a piece.</h2>
+        <p>Team apparel, event merch, a single custom illustration — tell me the brief and I'll follow up with a quote and timeline, usually within two business days.</p>
+      </div>
+    </div>
+
+    <form id="commission-form" class="grid grid-2" style="gap:1.25rem;" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID" method="POST">
+      <div class="field">
+        <label for="c-name">Name</label>
+        <input id="c-name" name="name" type="text" required>
+      </div>
+      <div class="field">
+        <label for="c-email">Email</label>
+        <input id="c-email" name="email" type="email" required>
+      </div>
+      <div class="field" style="grid-column:1/-1;">
+        <label for="c-type">Project type</label>
+        <select id="c-type" name="project_type">
+          <option>Custom apparel run</option>
+          <option>Single illustration</option>
+          <option>Event / team merch</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field" style="grid-column:1/-1;">
+        <label for="c-brief">Tell me about the project</label>
+        <textarea id="c-brief" name="brief" rows="5" required></textarea>
+      </div>
+      <div style="grid-column:1/-1;">
+        <button type="submit" class="btn btn-on-dark">Send inquiry</button>
+      </div>
+    </form>
+    <p style="margin-top:1.5rem;color:rgba(251,246,238,.55);font-size:.82rem;">
+      This form posts to Formspree as a working example — replace <code style="color:var(--gold-400);">REPLACE_WITH_YOUR_FORM_ID</code> with your own form endpoint (Formspree, a Google Sheet via Apps Script, or your own backend) to start receiving submissions.
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Jack Imagined</div>
+        <p style="max-width:32ch;font-size:.9rem;">Custom graphic apparel and original art, made where the night sky meets the first light.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All products</a></li>
+          <li><a href="shop.html">Apparel</a></li>
+          <li><a href="shop.html">Art prints</a></li>
+          <li><a href="shop.html">Accessories</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Studio</h4>
+        <ul>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="#commission">Commissions</a></li>
+          <li><a href="book.html">First Light book</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="checkout.html">Checkout &amp; payment</a></li>
+          <li><a href="checkout.html#etransfer">Interac e-Transfer</a></li>
+          <li><a href="mailto:hello@jackimagined.com">hello@jackimagined.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Jack Imagined. All artwork original.</span>
+      <div class="pay-icons"><span>Stripe</span><span>PayPal</span><span>Interac e-Transfer</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="cart-overlay" data-cart-overlay></div>
+<aside class="cart-drawer" data-cart-drawer aria-label="Shopping cart">
+  <div class="cart-head">
+    <h3 style="margin:0;">Your cart</h3>
+    <button data-cart-close class="btn btn-ghost" aria-label="Close cart" style="padding:0;">Close</button>
+  </div>
+  <div class="cart-items" data-cart-items></div>
+  <div class="cart-foot">
+    <div class="order-line"><span>Subtotal</span><span data-cart-total>$0.00 CAD</span></div>
+    <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:1rem;">Go to checkout</a>
+  </div>
+</aside>
+
+<script src="js/main.js"></script>
+</body>
+</html>

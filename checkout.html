@@ -1,0 +1,234 @@
+/* ==========================================================================
+   JACK IMAGINED — site script
+   Cart is held in memory (not localStorage) so it resets on reload — see
+   README "Making the cart persistent" for how to wire real persistence.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. PRODUCT CATALOG
+   In production, replace PRODUCTS with a fetch() to your own backend
+   endpoint that proxies the Printify API (see README — "Connecting
+   Printify"). Printify's private API token must never be called from
+   this front-end code directly.
+--------------------------------------------------------------------- */
+const PRODUCTS = [
+  { id: "dawn-tee",        name: "Dawn Horizon Tee",        category: "apparel", price: 38, tag: "Bestseller", stripeLink: "https://buy.stripe.com/REPLACE_dawn_tee", paypalId: "REPLACE_dawn_tee" },
+  { id: "ember-hoodie",    name: "Ember Line Hoodie",       category: "apparel", price: 74, tag: "New",        stripeLink: "https://buy.stripe.com/REPLACE_ember_hoodie", paypalId: "REPLACE_ember_hoodie" },
+  { id: "solstice-cap",    name: "Solstice Dad Cap",        category: "apparel", price: 28, tag: null,         stripeLink: "https://buy.stripe.com/REPLACE_solstice_cap", paypalId: "REPLACE_solstice_cap" },
+  { id: "aurora-crew",     name: "Aurora Crewneck",         category: "apparel", price: 58, tag: null,         stripeLink: "https://buy.stripe.com/REPLACE_aurora_crew", paypalId: "REPLACE_aurora_crew" },
+  { id: "skyline-print",   name: "Skyline Study — Giclée Print", category: "art", price: 45, tag: "Limited",  stripeLink: "https://buy.stripe.com/REPLACE_skyline_print", paypalId: "REPLACE_skyline_print" },
+  { id: "daybreak-print",  name: "Daybreak No. 3 — Giclée Print", category: "art", price: 45, tag: null,      stripeLink: "https://buy.stripe.com/REPLACE_daybreak_print", paypalId: "REPLACE_daybreak_print" },
+  { id: "sunrise-tote",    name: "Sunrise Canvas Tote",     category: "accessories", price: 22, tag: null,     stripeLink: "https://buy.stripe.com/REPLACE_sunrise_tote", paypalId: "REPLACE_sunrise_tote" },
+  { id: "horizon-sticker", name: "Horizon Sticker Pack",    category: "accessories", price: 12, tag: null,     stripeLink: "https://buy.stripe.com/REPLACE_horizon_sticker", paypalId: "REPLACE_horizon_sticker" },
+];
+
+/* ---------------------------------------------------------------------
+   2. CART (in-memory)
+--------------------------------------------------------------------- */
+const cart = [];
+
+function addToCart(productId){
+  const product = PRODUCTS.find(p => p.id === productId);
+  if(!product) return;
+  const existing = cart.find(i => i.id === productId);
+  if(existing){ existing.qty += 1; } else { cart.push({ ...product, qty: 1 }); }
+  renderCart();
+  openCart();
+}
+
+function removeFromCart(productId){
+  const idx = cart.findIndex(i => i.id === productId);
+  if(idx > -1) cart.splice(idx, 1);
+  renderCart();
+}
+
+function cartTotal(){
+  return cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+}
+
+function renderCart(){
+  const countEls = document.querySelectorAll("[data-cart-count]");
+  const itemCount = cart.reduce((s,i)=>s+i.qty,0);
+  countEls.forEach(el => el.textContent = itemCount);
+
+  const listEl = document.querySelector("[data-cart-items]");
+  const totalEl = document.querySelector("[data-cart-total]");
+  if(!listEl) return;
+
+  if(cart.length === 0){
+    listEl.innerHTML = `<p class="cart-empty">Your cart is empty. Browse the <a href="shop.html" style="color:var(--orange-600);text-decoration:underline;">shop</a> to find your next piece.</p>`;
+  } else {
+    listEl.innerHTML = cart.map(i => `
+      <div class="cart-item">
+        <div class="thumb"></div>
+        <div class="info">
+          <b>${i.name}</b>
+          <span>Qty ${i.qty} · $${i.price.toFixed(2)}</span>
+          <button class="rm" data-remove="${i.id}">Remove</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  if(totalEl) totalEl.textContent = `$${cartTotal().toFixed(2)} CAD`;
+
+  listEl.querySelectorAll("[data-remove]").forEach(btn=>{
+    btn.addEventListener("click", () => removeFromCart(btn.dataset.remove));
+  });
+}
+
+function openCart(){
+  document.querySelector("[data-cart-overlay]")?.classList.add("open");
+  document.querySelector("[data-cart-drawer]")?.classList.add("open");
+}
+function closeCart(){
+  document.querySelector("[data-cart-overlay]")?.classList.remove("open");
+  document.querySelector("[data-cart-drawer]")?.classList.remove("open");
+}
+
+/* ---------------------------------------------------------------------
+   3. PRODUCT GRID RENDERING (shop.html)
+--------------------------------------------------------------------- */
+function renderProductGrid(filter = "all"){
+  const grid = document.querySelector("[data-product-grid]");
+  if(!grid) return;
+  const items = filter === "all" ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
+  grid.innerHTML = items.map(p => `
+    <article class="card">
+      <div class="card-media">
+        ${p.tag ? `<span class="card-tag">${p.tag}</span>` : ""}
+        <span>Product photo</span>
+      </div>
+      <div class="card-body">
+        <h3>${p.name}</h3>
+        <p class="card-desc">Printed to order via Printify · ships in 3–5 days</p>
+        <div class="card-foot">
+          <span class="price">$${p.price.toFixed(2)}</span>
+          <button class="btn btn-primary" data-add="${p.id}">Add to cart</button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  grid.querySelectorAll("[data-add]").forEach(btn=>{
+    btn.addEventListener("click", () => addToCart(btn.dataset.add));
+  });
+}
+
+/* ---------------------------------------------------------------------
+   4. INIT — runs on every page
+--------------------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // mobile nav
+  const toggle = document.querySelector("[data-nav-toggle]");
+  const links = document.querySelector("[data-nav-links]");
+  toggle?.addEventListener("click", () => {
+    links.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", links.classList.contains("open"));
+  });
+
+  // cart drawer wiring
+  document.querySelectorAll("[data-cart-open]").forEach(b => b.addEventListener("click", openCart));
+  document.querySelector("[data-cart-close]")?.addEventListener("click", closeCart);
+  document.querySelector("[data-cart-overlay]")?.addEventListener("click", closeCart);
+  renderCart();
+
+  // shop filters
+  const filterRow = document.querySelector("[data-filter-row]");
+  if(filterRow){
+    renderProductGrid("all");
+    filterRow.querySelectorAll("button").forEach(btn=>{
+      btn.addEventListener("click", () => {
+        filterRow.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        renderProductGrid(btn.dataset.filter);
+      });
+    });
+  }
+
+  // checkout payment tabs
+  const payTabs = document.querySelectorAll("[data-pay-tab]");
+  payTabs.forEach(tab=>{
+    tab.addEventListener("click", () => {
+      payTabs.forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll(".pay-panel").forEach(p=>p.classList.remove("active"));
+      tab.classList.add("active");
+      document.querySelector(`[data-pay-panel="${tab.dataset.payTab}"]`)?.classList.add("active");
+    });
+  });
+
+  // checkout order summary (reads cart)
+  const checkoutList = document.querySelector("[data-checkout-summary]");
+  if(checkoutList){
+    if(cart.length === 0){
+      checkoutList.innerHTML = `<p class="cart-empty">No items yet — <a href="shop.html" style="color:var(--gold-400);text-decoration:underline;">add something from the shop</a> first.</p>`;
+    } else {
+      checkoutList.innerHTML = cart.map(i => `
+        <div class="order-line"><span>${i.name} × ${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>
+      `).join("");
+    }
+    const totalEl = document.querySelector("[data-checkout-total]");
+    if(totalEl) totalEl.textContent = `$${cartTotal().toFixed(2)} CAD`;
+  }
+
+  // coming-soon book notify form (demo only — wire to your own list provider)
+  const notifyForm = document.querySelector("[data-notify-form]");
+  notifyForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const feedback = notifyForm.querySelector("[data-notify-feedback]");
+    feedback.textContent = "You're on the list — we'll email you the moment pre-orders open.";
+    notifyForm.reset();
+  });
+
+  // e-transfer confirmation form (demo only — wire to your own inbox/backend)
+  const etransferForm = document.querySelector("[data-etransfer-form]");
+  etransferForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const feedback = etransferForm.querySelector("[data-etransfer-feedback]");
+    feedback.textContent = "Thanks! We'll confirm by email once your e-Transfer is received (usually within one business day).";
+    etransferForm.reset();
+  });
+
+  initPayPalButton();
+});
+
+/* ---------------------------------------------------------------------
+   5. STRIPE — checkout redirect
+   Uses Stripe Payment Links (no secret key exposed client-side).
+   For a true multi-item cart checkout, create a Checkout Session
+   server-side instead — see README "Connecting Stripe".
+--------------------------------------------------------------------- */
+function goToStripeCheckout(){
+  if(cart.length === 0) return;
+  // Single-item carts can go straight to that product's Payment Link.
+  // Multi-item carts need a server-created Checkout Session (see README).
+  if(cart.length === 1){
+    window.location.href = cart[0].stripeLink;
+  } else {
+    alert("Multi-item Stripe checkout requires a small server function to combine items into one Checkout Session. See README 'Connecting Stripe' for the ~15 lines of code needed, or check out items one at a time for now.");
+  }
+}
+
+/* ---------------------------------------------------------------------
+   6. PAYPAL — Smart Buttons
+   Loads the PayPal SDK with your publishable client-id (safe to expose)
+   and renders real buttons into #paypal-button-container on checkout.html.
+--------------------------------------------------------------------- */
+function initPayPalButton(){
+  const container = document.getElementById("paypal-button-container");
+  if(!container || typeof paypal === "undefined") return;
+
+  paypal.Buttons({
+    style: { color: "gold", shape: "rect", label: "paypal", height: 48 },
+    createOrder: function(data, actions) {
+      const total = cartTotal().toFixed(2);
+      return actions.order.create({
+        purchase_units: [{ amount: { value: total, currency_code: "CAD" } }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        alert("Payment complete — thank you, " + details.payer.name.given_name + "! A confirmation email is on its way.");
+      });
+    }
+  }).render("#paypal-button-container");
+}
